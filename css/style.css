@@ -1,0 +1,80 @@
+@import url(https://fonts.googleapis.com/css?family=Montserrat);
+
+body {
+  background: #222;
+  color: #eee;
+  font-family: "Montserrat", sans-serif;
+}
+
+a {
+  color: #2cc990;
+}
+
+h1 {
+  color: #2cc990;
+  margin: 20px;
+}
+
+.keyboard {
+  padding: 0;
+  width: 554px;
+  height: 134px;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.keyboard li {
+  border: 1px solid #2cc990;
+  border-radius: 8px;
+  box-sizing: border-box;
+  color: #2cc990;
+  display: block;
+  padding: 8px;
+  position: absolute;
+  text-transform: uppercase;
+  top: 0;
+  height: 64px;
+  width: 64px;
+}
+
+.keyboard li:nth-child(1),
+.keyboard li:nth-child(3),
+.keyboard li:nth-child(5),
+.keyboard li:nth-child(6),
+.keyboard li:nth-child(8),
+.keyboard li:nth-child(10),
+.keyboard li:nth-child(12),
+.keyboard li:nth-child(13) {
+  top: 70px;
+}
+
+.keyboard li:nth-child(1) { left: 0; }
+.keyboard li:nth-child(2) { left: 35px; }
+.keyboard li:nth-child(3) { left: 70px; }
+.keyboard li:nth-child(4) { left: 105px; }
+.keyboard li:nth-child(5) { left: 140px; }
+.keyboard li:nth-child(6) { left: 210px; }
+.keyboard li:nth-child(7) { left: 245px; }
+.keyboard li:nth-child(8) { left: 280px; }
+.keyboard li:nth-child(9) { left: 315px; }
+.keyboard li:nth-child(10) { left: 350px; }
+.keyboard li:nth-child(11) { left: 385px; }
+.keyboard li:nth-child(12) { left: 420px; }
+.keyboard li:nth-child(13) { left: 490px; }
+
+.keyboard [data-key-down='true'] {
+  background: #2cc990;
+  color: #222;
+}
+
+.by-line {
+  text-align: center;
+  font-size: smaller;
+  position: fixed;
+  bottom: 40px;
+  left: 0; right: 0;
+}

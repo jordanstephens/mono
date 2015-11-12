@@ -5,6 +5,7 @@
 (defn defosc [context]
   (let [osc (.createOscillator context)]
     (do (.start osc 0)
+        (set! (.-type osc) "triangle")
         osc)))
 
 (defn defgain [context]

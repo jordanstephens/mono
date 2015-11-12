@@ -15,18 +15,38 @@ h1 {
   margin: 20px;
 }
 
-.keyboard {
+.keyboard-container {
   padding: 0;
-  width: 554px;
-  height: 134px;
   margin: auto;
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
+  width: 554px;
+  height: 204px;
 }
 
+.control-keys, .keyboard {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+.control-keys {
+  height: 64px;
+}
+
+.control-keys li:nth-child(1) { right: 70px; }
+.control-keys li:nth-child(2) { right: 0; }
+
+.keyboard {
+  height: 134px;
+  margin-top: 6px;
+}
+
+.control-keys li,
 .keyboard li {
   border: 1px solid #2cc990;
   border-radius: 8px;
@@ -39,6 +59,11 @@ h1 {
   top: 0;
   height: 64px;
   width: 64px;
+}
+
+.control-keys li {
+  border-color: #c98f2c;
+  color: #c98f2c;
 }
 
 .keyboard li:nth-child(1),
@@ -68,6 +93,11 @@ h1 {
 
 .keyboard [data-key-down='true'] {
   background: #2cc990;
+  color: #222;
+}
+
+.control-keys [data-key-down='true'] {
+  background: #c98f2c;
   color: #222;
 }
 

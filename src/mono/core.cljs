@@ -4,11 +4,11 @@
 
 (enable-console-print!)
 
-(def key-width 64)
-(def key-height 64)
+(defonce reference-frequency 440.0)
+(defonce reference-frequency-key-idx 9)
 
 ; use an array-map to maintain key order
-(def key-map (array-map
+(defonce keyboard-map (array-map
   90  {:label "z" :x 0}
   83  {:label "s" :x 0.5}
   88  {:label "x" :x 1}
@@ -24,51 +24,106 @@
   188 {:label "," :x 7}
 ))
 
-(defonce keys-down (atom #{}))
-(defonce reference-frequency-idx 9)
+(defonce control-key-map (array-map
+  219 {:label "["}
+  221 {:label "]"}
+))
+
+; app state
+(defonce keyboard-keys-down (atom #{}))
+(defonce control-keys-down (atom #{}))
+(defonce octave-offset (atom 0))
+
+
 
 (defn index [list x]
   (.indexOf (to-array list) x))
 
-(defn key-code-frequency [key-code]
-  (let [key-codes (keys key-map)
-        idx (+ 40 (index key-codes key-code))]
-    (* 440.0 (Math/pow 2.0 (/ (- idx 49) 12.0)))))
+; twelfth root of 2
+; https://en.wikipedia.org/wiki/Twelfth_root_of_two
+(defn reference-frequency-multiplicand [idx]
+  (Math/pow 2.0 (/ idx 12.0)))
 
-(defn with-valid-key-code [event f]
+(defn key-code-frequency [key-code]
+  (let [key-codes (keys keyboard-map)
+        key-idx (- (index key-codes key-code) reference-frequency-key-idx)
+        frequency-idx (+ (* (/ @octave-offset 1.0) 12.0) key-idx)]
+    (* reference-frequency (reference-frequency-multiplicand frequency-idx))))
+
+(defn with-key-code-in-map [event map f]
   (let [key-code (.-keyCode event)]
-    (if (contains? key-map key-code)
+    (if (contains? map key-code)
       (do
         (.preventDefault event)
         (f key-code)))))
 
+(defn with-keyboard-code [event f]
+  (with-key-code-in-map event keyboard-map f))
+
+(defn with-control-code [event f]
+  (with-key-code-in-map event control-key-map f))
+
+(defn octave-up []
+  (reset! octave-offset (+ @octave-offset 1)))
+
+(defn octave-down []
+  (reset! octave-offset (- @octave-offset 1)))
+
+(defn map-control-key [key-code]
+  (case key-code
+    219 (octave-down)
+    221 (octave-up)))
+
 (defn handle-keydown [event]
-  (with-valid-key-code event (fn [key-code]
-    (do
-      (swap! keys-down conj key-code)
-      (synth/note-on (key-code-frequency key-code))))))
+  (do
+    (with-keyboard-code event (fn [key-code]
+      (do
+        (swap! keyboard-keys-down conj key-code)
+        (synth/note-on (key-code-frequency key-code)))))
+    (with-control-code event (fn [key-code]
+      (do
+        (map-control-key key-code)
+        (swap! control-keys-down conj key-code))))))
 
 (defn handle-keyup [event]
-  (with-valid-key-code event (fn [key-code]
-    (do
-      (swap! keys-down disj key-code)
-      (if (empty? @keys-down)
-          (synth/note-off)
-          (synth/note-on (key-code-frequency (first @keys-down))))))))
+  (do
+    (with-keyboard-code event (fn [key-code]
+      (do
+        (swap! keyboard-keys-down disj key-code)
+        (if (empty? @keyboard-keys-down)
+            (synth/note-off)
+            (synth/note-on (key-code-frequency (first @keyboard-keys-down)))))))
+    (with-control-code event (fn [key-code]
+      (do
+        (swap! control-keys-down disj key-code))))))
+
+
+
+(defn control-keys []
+  [:ol {:className "control-keys"}
+    (doall (map-indexed
+      (fn [idx [key-code {label :label}]]
+        [:li {:key idx :data-key-down (contains? @control-keys-down key-code)}
+          [:span label]])
+      control-key-map))])
 
 (defn keyboard []
   [:ol {:className "keyboard"}
     (doall (map-indexed
-      (fn [idx [key-code {label :label x :x y :y}]]
-        [:li {:key idx :data-key-down (contains? @keys-down key-code)}
+      (fn [idx [key-code {label :label}]]
+        [:li {:key idx :data-key-down (contains? @keyboard-keys-down key-code)}
           [:span label]])
-      key-map))])
+      keyboard-map))])
 
 (defn app []
-  [:div {:className "keyboard-container"} [keyboard]])
+  [:div {:className "keyboard-container"} [control-keys] [keyboard]])
+
+
 
 (.addEventListener js/document "keydown" handle-keydown)
 (.addEventListener js/document "keyup" handle-keyup)
+
+
 
 (reagent/render-component [app]
   (. js/document (getElementById "app")))

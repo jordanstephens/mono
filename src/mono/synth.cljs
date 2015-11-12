@@ -20,9 +20,12 @@
 (.connect osc1-gain (.-destination context))
 
 (defn note-on [frequency]
-  (do
-    (set! (.-value (.-frequency osc1)) frequency)
-    (set! (.-value (.-gain osc1-gain)) 1)))
+  (let [now (.-currentTime context)
+        osc-frequency (.-frequency osc1)
+        osc-gain (.-gain osc1-gain)]
+    (do
+      (.setValueAtTime osc-frequency frequency now)
+      (.setValueAtTime osc-gain 1.0 now))))
 
 (defn note-off []
-  (set! (.-value (.-gain osc1-gain)) 0))
+  (.setValueAtTime (.-gain osc1-gain) 0.0 (.-currentTime context)))

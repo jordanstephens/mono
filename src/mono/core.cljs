@@ -6,6 +6,8 @@
 
 (defonce reference-frequency 440.0)
 (defonce reference-frequency-key-idx 9)
+(defonce octave-offset-minimum -2)
+(defonce octave-offset-maximum 2)
 
 ; use an array-map to maintain key order
 (defonce keyboard-map (array-map
@@ -64,10 +66,12 @@
   (with-key-code-in-map event control-key-map f))
 
 (defn octave-up []
-  (reset! octave-offset (+ @octave-offset 1)))
+  (if (< @octave-offset octave-offset-maximum)
+    (reset! octave-offset (+ @octave-offset 1))))
 
 (defn octave-down []
-  (reset! octave-offset (- @octave-offset 1)))
+  (if (> @octave-offset octave-offset-minimum)
+    (reset! octave-offset (- @octave-offset 1))))
 
 (defn map-control-key [key-code]
   (case key-code
@@ -100,12 +104,20 @@
 
 
 (defn control-keys []
-  [:ol {:className "control-keys"}
-    (doall (map-indexed
-      (fn [idx [key-code {label :label}]]
-        [:li {:key idx :data-key-down (contains? @control-keys-down key-code)}
-          [:span label]])
-      control-key-map))])
+  [:div {:className "control-keys-container"}
+    [:div {:className "control-group octave"}
+      [:div {:className "control-label"}
+        [:ul {:className "octave-offset-value"}
+          [:li {:data-light (if (contains? #{-2 -1} @octave-offset) "true" "false")}"•"]
+          [:li {:data-light (if (contains? #{-1 0 1} @octave-offset) "true" "false")}"•"]
+          [:li {:data-light (if (contains? #{1 2} @octave-offset) "true" "false")}"•"]
+        ]]
+      [:ol {:className "control-keys"}
+        (doall (map-indexed
+          (fn [idx [key-code {label :label}]]
+            [:li {:key idx :data-key-down (contains? @control-keys-down key-code)}
+              [:span label]])
+          control-key-map))]]])
 
 (defn keyboard []
   [:ol {:className "keyboard"}
@@ -116,7 +128,9 @@
       keyboard-map))])
 
 (defn app []
-  [:div {:className "keyboard-container"} [control-keys] [keyboard]])
+  [:div {:className "keyboard-container"}
+    [control-keys]
+    [keyboard]])
 
 
 

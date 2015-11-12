@@ -15,55 +15,89 @@ h1 {
   margin: 20px;
 }
 
-.keyboard-container {
-  padding: 0;
-  margin: auto;
+#app {
+  display: flex;
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  width: 554px;
-  height: 204px;
+  align-items: center;
+  justify-content: center;
 }
 
-.control-keys, .keyboard {
+.keyboard-container {
+  padding: 0;
+  width: 554px;
+}
+
+.keyboard, .control-keys,
+.control-label ul {
   list-style: none;
   padding: 0;
   margin: 0;
   position: relative;
 }
 
-.control-keys {
-  height: 64px;
+.control-label li[data-light='false'] { color: #444 }
+.control-label li[data-light='true'] { color: #c98f2c; }
+
+.octave {
+  float: right;
+  width: 136px;
 }
 
-.control-keys li:nth-child(1) { right: 70px; }
-.control-keys li:nth-child(2) { right: 0; }
+.control-keys-container { overflow: auto; }
 
 .keyboard {
   height: 134px;
   margin-top: 6px;
+  margin-bottom: 35px;
 }
 
 .control-keys li,
 .keyboard li {
-  border: 1px solid #2cc990;
+  border: 1px solid;
   border-radius: 8px;
   box-sizing: border-box;
-  color: #2cc990;
   display: block;
   padding: 8px;
-  position: absolute;
+  text-align: left;
   text-transform: uppercase;
-  top: 0;
   height: 64px;
   width: 64px;
 }
 
+.keyboard li {
+  border-color: #2cc990;
+  color: #2cc990;
+  position: absolute;
+  top: 0;
+}
+
+.control-keys { overflow: auto; }
 .control-keys li {
   border-color: #c98f2c;
   color: #c98f2c;
+  float: left;
+  margin-left: 6px;
+}
+
+.control-keys li:first-child { margin-left: 0; }
+
+.control-group {
+  text-align: center;
+}
+
+.control-label {
+  font-size: smaller;
+  margin-bottom: 6px;
+}
+
+.control-label li {
+  display: inline;
+  font-size: x-large;
+  padding: 2px;
 }
 
 .keyboard li:nth-child(1),

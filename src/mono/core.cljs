@@ -95,26 +95,30 @@
 
 (defn handle-keydown [event]
   (do
-    (with-keyboard-code event (fn [key-code]
-      (do
-        (swap! keyboard-keys-down conj key-code)
-        (synth/note-on (key-code-frequency key-code) (:name (current-waveform))))))
-    (with-control-code event (fn [key-code]
-      (do
-        (map-control-key key-code)
-        (swap! control-keys-down conj key-code))))))
+    (with-keyboard-code event
+      (fn [key-code]
+        (do
+          (swap! keyboard-keys-down conj key-code)
+          (synth/note-on (key-code-frequency key-code) (:name (current-waveform))))))
+    (with-control-code event
+      (fn [key-code]
+        (do
+          (map-control-key key-code)
+          (swap! control-keys-down conj key-code))))))
 
 (defn handle-keyup [event]
   (do
-    (with-keyboard-code event (fn [key-code]
-      (do
-        (swap! keyboard-keys-down disj key-code)
-        (if (empty? @keyboard-keys-down)
-            (synth/note-off)
-            (synth/note-on (key-code-frequency (first @keyboard-keys-down)) (:name (current-waveform)))))))
-    (with-control-code event (fn [key-code]
-      (do
-        (swap! control-keys-down disj key-code))))))
+    (with-keyboard-code event
+      (fn [key-code]
+        (do
+          (swap! keyboard-keys-down disj key-code)
+          (if (empty? @keyboard-keys-down)
+              (synth/note-off)
+              (synth/note-on (key-code-frequency (first @keyboard-keys-down)) (:name (current-waveform)))))))
+    (with-control-code event
+      (fn [key-code]
+        (do
+          (swap! control-keys-down disj key-code))))))
 
 (defn waveform-control-keys []
   [:div {:className "control-group waveform"}
@@ -131,14 +135,15 @@
       [:ul {:className "octave-offset-value"}
         [:li {:data-light (if (contains? #{-2 -1} @octave-offset) "true" "false")}"•"]
         [:li {:data-light (if (contains? #{-1 0 1} @octave-offset) "true" "false")}"•"]
-        [:li {:data-light (if (contains? #{1 2} @octave-offset) "true" "false")}"•"]
-      ]]
+        [:li {:data-light (if (contains? #{1 2} @octave-offset) "true" "false")}"•"]]]
+
     [:ol {:className "control-keys"}
-      (doall (map-indexed
-        (fn [idx [key-code {label :label}]]
-          [:li {:key idx :data-key-down (contains? @control-keys-down key-code)}
-            [:span label]])
-        octave-key-map))]])
+      (doall
+        (map-indexed
+          (fn [idx [key-code {label :label}]]
+            [:li {:key idx :data-key-down (contains? @control-keys-down key-code)}
+              [:span label]])
+          octave-key-map))]])
 
 (defn control-keys []
   [:div {:className "control-keys-container"}
@@ -147,11 +152,12 @@
 
 (defn keyboard []
   [:ol {:className "keyboard"}
-    (doall (map-indexed
-      (fn [idx [key-code {label :label}]]
-        [:li {:key idx :data-key-down (contains? @keyboard-keys-down key-code)}
-          [:span label]])
-      keyboard-map))])
+    (doall
+      (map-indexed
+        (fn [idx [key-code {label :label}]]
+          [:li {:key idx :data-key-down (contains? @keyboard-keys-down key-code)}
+            [:span label]])
+        keyboard-map))])
 
 (defn app []
   [:div {:className "keyboard-container"}
@@ -173,5 +179,4 @@
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
   (.removeEventListener js/document "keydown" handle-keydown)
-  (.removeEventListener js/document "keyup" handle-keyup)
-)
+  (.removeEventListener js/document "keyup" handle-keyup))

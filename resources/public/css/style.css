@@ -42,6 +42,11 @@ h1 {
 .control-label li[data-light='false'] { color: #444 }
 .control-label li[data-light='true'] { color: #c98f2c; }
 
+.waveform {
+  float: left;
+  width: 64px;
+}
+
 .octave {
   float: right;
   width: 136px;

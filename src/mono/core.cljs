@@ -39,8 +39,8 @@
   (merge octave-key-map waveform-key-map))
 
 ; app state
-(defonce keyboard-keys-down (atom #{}))
-(defonce control-keys-down (atom #{}))
+(defonce keyboard-keys-down (atom '()))
+(defonce control-keys-down (atom '()))
 (defonce octave-offset (atom 0))
 (defonce waveform-index (atom 0))
 
@@ -93,32 +93,42 @@
     219 (octave-down)
     221 (octave-up)))
 
+(defn record-keydown [set key-code]
+  (swap! set (fn [xs x] (cons x xs)) key-code))
+
+(defn record-keyup [set key-code]
+  (swap! set (fn [xs x] (remove #(= % x) xs)) key-code))
+
 (defn handle-keydown [event]
   (do
     (with-keyboard-code event
       (fn [key-code]
         (do
-          (swap! keyboard-keys-down conj key-code)
+          (record-keydown keyboard-keys-down key-code)
           (synth/note-on (key-code-frequency key-code) (:name (current-waveform))))))
     (with-control-code event
       (fn [key-code]
         (do
           (map-control-key key-code)
-          (swap! control-keys-down conj key-code))))))
+          (record-keydown control-keys-down key-code))))))
 
 (defn handle-keyup [event]
   (do
     (with-keyboard-code event
       (fn [key-code]
         (do
-          (swap! keyboard-keys-down disj key-code)
+          (record-keyup keyboard-keys-down key-code)
           (if (empty? @keyboard-keys-down)
               (synth/note-off)
               (synth/note-on (key-code-frequency (first @keyboard-keys-down)) (:name (current-waveform)))))))
     (with-control-code event
       (fn [key-code]
         (do
-          (swap! control-keys-down disj key-code))))))
+          (record-keyup control-keys-down key-code))))))
+
+(defn key-is-down? [key-code set]
+  (boolean (some #{key-code} set)))
+
 
 (defn waveform-control-keys []
   [:div {:className "control-group waveform"}
@@ -126,7 +136,7 @@
       [:ul {:className "waveform-value"}
         [:li (:label (current-waveform))]]]
     [:ol {:className "control-keys"}
-      [:li {:key 0 :data-key-down (contains? @control-keys-down 81)}
+      [:li {:key 0 :data-key-down (key-is-down? 81 @control-keys-down)}
         [:span "q"]]]])
 
 (defn octave-control-keys []
@@ -141,7 +151,7 @@
       (doall
         (map-indexed
           (fn [idx [key-code {label :label}]]
-            [:li {:key idx :data-key-down (contains? @control-keys-down key-code)}
+            [:li {:key idx :data-key-down (key-is-down? key-code @control-keys-down)}
               [:span label]])
           octave-key-map))]])
 
@@ -155,7 +165,7 @@
     (doall
       (map-indexed
         (fn [idx [key-code {label :label}]]
-          [:li {:key idx :data-key-down (contains? @keyboard-keys-down key-code)}
+          [:li {:key idx :data-key-down (key-is-down? key-code @keyboard-keys-down)}
             [:span label]])
         keyboard-map))])
 

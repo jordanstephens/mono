@@ -130,7 +130,8 @@
         [:li (:label (synth/current-waveform))]]]
     [:ol {:className "control-keys"}
       [:li {:key 0 :data-key-down (key-is-down? 81 @control-keys-down)}
-        [:span "q"]]]])
+        [:button
+          [:div "q"]]]]])
 
 (defn octave-control-keys []
   [:div {:className "control-group octave"}
@@ -145,7 +146,8 @@
         (map-indexed
           (fn [idx [key-code {label :label}]]
             [:li {:key idx :data-key-down (key-is-down? key-code @control-keys-down)}
-              [:span label]])
+              [:button
+                [:div label]]])
           octave-key-map))]])
 
 (defn control-keys []
@@ -159,7 +161,8 @@
       (map-indexed
         (fn [idx [key-code {label :label}]]
           [:li {:key idx :data-key-down (key-is-down? key-code @keyboard-keys-down)}
-            [:span label]])
+            [:button
+              [:div label]]])
         keyboard-map))])
 
 (defn app []

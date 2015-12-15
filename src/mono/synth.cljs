@@ -2,6 +2,7 @@
 
 (defonce context (js/AudioContext.))
 
+(defonce max-gain (atom 1.0))
 (defonce waveform-index (atom 0))
 
 (defonce waveforms
@@ -40,7 +41,7 @@
     (do
       (set! (.-type osc1) waveform)
       (.setValueAtTime osc-frequency frequency now)
-      (.setValueAtTime osc-gain 0.25 now))))
+      (.setValueAtTime osc-gain @max-gain now))))
 
 (defn note-off []
   (.setValueAtTime (.-gain osc1-gain) 0.0 (.-currentTime context)))

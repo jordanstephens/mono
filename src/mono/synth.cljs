@@ -2,10 +2,18 @@
 
 (defonce context (js/AudioContext.))
 
+(defonce waveform-index (atom 0))
+
 (defonce waveforms
   [{:name "sine" :label "∿"}
    {:name "triangle" :label "⋀"}
    {:name "square" :label "⊓"}])
+
+(defn change-waveform []
+  (reset! waveform-index (mod (+ @waveform-index 1) 3)))
+
+(defn current-waveform []
+  (get waveforms @waveform-index))
 
 (defn defosc [context]
   (let [osc (.createOscillator context)]
@@ -24,14 +32,15 @@
 (.connect osc1 osc1-gain)
 (.connect osc1-gain (.-destination context))
 
-(defn note-on [frequency waveform]
+(defn note-on [frequency]
   (let [now (.-currentTime context)
+        waveform (:name (current-waveform))
         osc-frequency (.-frequency osc1)
         osc-gain (.-gain osc1-gain)]
     (do
       (set! (.-type osc1) waveform)
       (.setValueAtTime osc-frequency frequency now)
-      (.setValueAtTime osc-gain 1.0 now))))
+      (.setValueAtTime osc-gain 0.25 now))))
 
 (defn note-off []
   (.setValueAtTime (.-gain osc1-gain) 0.0 (.-currentTime context)))

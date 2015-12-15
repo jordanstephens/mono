@@ -42,7 +42,6 @@
 (defonce keyboard-keys-down (atom '()))
 (defonce control-keys-down (atom '()))
 (defonce octave-offset (atom 0))
-(defonce waveform-index (atom 0))
 
 
 
@@ -73,12 +72,6 @@
 (defn with-control-code [event f]
   (with-key-code-in-map event control-key-map f))
 
-(defn change-waveform []
-  (reset! waveform-index (mod (+ @waveform-index 1) 3)))
-
-(defn current-waveform []
-  (get synth/waveforms @waveform-index))
-
 (defn octave-up []
   (if (< @octave-offset octave-offset-maximum)
     (reset! octave-offset (+ @octave-offset 1))))
@@ -89,7 +82,7 @@
 
 (defn map-control-key [key-code]
   (case key-code
-    81 (change-waveform)
+    81 (synth/change-waveform)
     219 (octave-down)
     221 (octave-up)))
 
@@ -105,7 +98,7 @@
       (fn [key-code]
         (do
           (record-keydown keyboard-keys-down key-code)
-          (synth/note-on (key-code-frequency key-code) (:name (current-waveform))))))
+          (synth/note-on (key-code-frequency key-code)))))
     (with-control-code event
       (fn [key-code]
         (do
@@ -120,7 +113,7 @@
           (record-keyup keyboard-keys-down key-code)
           (if (empty? @keyboard-keys-down)
               (synth/note-off)
-              (synth/note-on (key-code-frequency (first @keyboard-keys-down)) (:name (current-waveform)))))))
+              (synth/note-on (key-code-frequency (first @keyboard-keys-down)))))))
     (with-control-code event
       (fn [key-code]
         (do
@@ -134,7 +127,7 @@
   [:div {:className "control-group waveform"}
     [:div {:className "control-label"}
       [:ul {:className "waveform-value"}
-        [:li (:label (current-waveform))]]]
+        [:li (:label (synth/current-waveform))]]]
     [:ol {:className "control-keys"}
       [:li {:key 0 :data-key-down (key-is-down? 81 @control-keys-down)}
         [:span "q"]]]])

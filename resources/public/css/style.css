@@ -14,6 +14,7 @@ a { color: #2cc990; }
 
 h1 {
   color: #2cc990;
+  font-size: 2em;
   margin: 20px;
 }
 
@@ -173,4 +174,18 @@ h1 {
   position: fixed;
   bottom: 40px;
   left: 0; right: 0;
+}
+
+@media screen and (max-width: 380px) {
+  h1 { font-size: 1.6em; }
+  .by-line { font-size: x-small; }
+}
+
+@media screen and (max-height: 380px) {
+  .by-line { bottom: 20px; }
+  h1 {
+    font-size: 1.6em;
+    margin-top: 10px;
+    text-align: center;
+  }
 }

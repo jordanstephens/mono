@@ -26,6 +26,8 @@ h1 {
   left: 0;
   align-items: center;
   justify-content: center;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .keyboard-container {

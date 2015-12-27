@@ -39,6 +39,7 @@
   (merge octave-key-map waveform-key-map))
 
 ; app state
+(defonce mousedown (atom false))
 (defonce keyboard-keys-down (atom '()))
 (defonce control-keys-down (atom '()))
 (defonce octave-offset (atom 0))
@@ -92,13 +93,23 @@
 (defn record-keyup [set key-code]
   (swap! set (fn [xs x] (remove #(= % x) xs)) key-code))
 
+(defn handle-keyboard-keydown [key-code]
+  (do
+    (record-keydown keyboard-keys-down key-code)
+    (synth/note-on (key-code-frequency key-code))))
+
+(defn handle-keyboard-keyup [key-code]
+  (do
+    (record-keyup keyboard-keys-down key-code)
+    (if (empty? @keyboard-keys-down)
+        (synth/note-off)
+        (synth/note-on (key-code-frequency (first @keyboard-keys-down))))))
+
 (defn handle-keydown [event]
   (do
     (with-keyboard-code event
       (fn [key-code]
-        (do
-          (record-keydown keyboard-keys-down key-code)
-          (synth/note-on (key-code-frequency key-code)))))
+        (handle-keyboard-keydown key-code)))
     (with-control-code event
       (fn [key-code]
         (do
@@ -109,11 +120,7 @@
   (do
     (with-keyboard-code event
       (fn [key-code]
-        (do
-          (record-keyup keyboard-keys-down key-code)
-          (if (empty? @keyboard-keys-down)
-              (synth/note-off)
-              (synth/note-on (key-code-frequency (first @keyboard-keys-down)))))))
+        (handle-keyboard-keyup key-code)))
     (with-control-code event
       (fn [key-code]
         (do
@@ -155,13 +162,39 @@
     [waveform-control-keys]
     [octave-control-keys]])
 
+(defn handle-key-mousedown [key-code]
+  (do
+    (reset! mousedown true)
+    (handle-keyboard-keydown key-code)))
+
+(defn handle-doc-mouseup []
+  (do
+    (reset! mousedown false)
+    (synth/note-off)))
+
+(defn handle-key-mouseup [key-code]
+  (do
+    (reset! mousedown false)
+    (handle-keyboard-keyup key-code)))
+
+(defn handle-key-mouseenter [key-code]
+  (do
+    (if @mousedown
+      (handle-keyboard-keydown key-code))))
+
+(defn handle-key-mouseleave [key-code]
+  (handle-keyboard-keyup key-code))
+
 (defn keyboard []
   [:ol {:className "keyboard"}
     (doall
       (map-indexed
         (fn [idx [key-code {label :label}]]
           [:li {:key idx :data-key-down (key-is-down? key-code @keyboard-keys-down)}
-            [:button
+            [:button {:onMouseDown  (.bind handle-key-mousedown nil key-code)
+                      :onMouseUp    (.bind handle-key-mouseup nil key-code)
+                      :onMouseEnter (.bind handle-key-mouseenter nil key-code)
+                      :onMouseLeave (.bind handle-key-mouseleave nil key-code)}
               [:div label]]])
         keyboard-map))])
 
@@ -174,6 +207,7 @@
 
 (.addEventListener js/document "keydown" handle-keydown)
 (.addEventListener js/document "keyup" handle-keyup)
+(.addEventListener js/document "mouseup" handle-doc-mouseup)
 
 
 
@@ -185,4 +219,5 @@
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
   (.removeEventListener js/document "keydown" handle-keydown)
-  (.removeEventListener js/document "keyup" handle-keyup))
+  (.removeEventListener js/document "keyup" handle-keyup)
+  (.removeEventListener js/document "mouseup" handle-doc-mouseup))

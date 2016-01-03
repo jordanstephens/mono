@@ -1,6 +1,12 @@
 (ns mono.synth)
 
-(defonce context (js/AudioContext.))
+(defonce context
+  (if
+    (exists? js/AudioContext.)
+    (js/AudioContext.)
+    (if (exists? (js/webkitAudioContext.))
+      (js/webkitAudioContext.)
+      (js/alert "Error: The Web Audio API is not support in this browser."))))
 
 (defonce max-gain (atom 1.0))
 (defonce waveform-index (atom 0))

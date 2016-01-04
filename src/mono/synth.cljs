@@ -19,7 +19,11 @@
    {:name "square" :label "⊓"}])
 
 (defn change-waveform []
-  (reset! waveform-index (mod (+ @waveform-index 1) 3)))
+  (let [new-waveform-index (mod (+ @waveform-index 1) 3)
+        new-waveform (:name (get waveforms new-waveform-index))]
+    (do
+      (reset! waveform-index new-waveform-index)
+      (set! (.-type osc1) new-waveform))))
 
 (defn current-waveform []
   (get waveforms @waveform-index))
@@ -32,11 +36,15 @@
     (do (set! (.-value (.-gain gain)) 0)
         gain)))
 
+
+
 (defonce osc1 (defosc context))
 (defonce osc1-gain (defgain context))
 
 (.connect osc1 osc1-gain)
 (.connect osc1-gain (.-destination context))
+
+
 
 (defn unlock []
   (do
@@ -45,12 +53,10 @@
 
 (defn note-on [frequency]
   (let [now (.-currentTime context)
-        waveform (:name (current-waveform))
         osc-frequency (.-frequency osc1)
         osc-gain (.-gain osc1-gain)]
     (do
       (if (= false @unlocked) (unlock))
-      (set! (.-type osc1) waveform)
       (.setValueAtTime osc-frequency frequency now)
       (.setValueAtTime osc-gain @max-gain now))))
 

@@ -1,6 +1,12 @@
 @import url(https://fonts.googleapis.com/css?family=Montserrat);
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
+  -webkit-touch-callout: none;
   background: #222;
   color: #eee;
   font-size: 16px;
@@ -12,10 +18,16 @@ body, button { font-family: "Montserrat", sans-serif; }
 
 a { color: #2cc990; }
 
-h1 {
+.mark {
+  box-sizing: border-box;
   color: #2cc990;
   font-size: 2em;
-  margin: 20px;
+  margin: 0;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
 #app {
@@ -177,15 +189,20 @@ h1 {
 }
 
 @media screen and (max-width: 380px) {
-  h1 { font-size: 1.6em; }
+  .mark { font-size: 1.6em; }
   .by-line { font-size: x-small; }
 }
 
 @media screen and (max-height: 380px) {
   .by-line { bottom: 20px; }
-  h1 {
+  .mark {
     font-size: 1.6em;
-    margin-top: 10px;
     text-align: center;
   }
+}
+
+@media screen and (max-height: 320px) {
+  .keyboard-container { height: 210px; max-width: 420px; }
+  .mark, .by-line { display: none; }
+  #app { height: 100%; }
 }

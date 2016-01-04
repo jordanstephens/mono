@@ -8,6 +8,8 @@
       (js/webkitAudioContext.)
       (js/alert "Error: The Web Audio API is not support in this browser."))))
 
+; https://paulbakaus.com/tutorials/html5/web-audio-on-ios/
+(defonce unlocked (atom false))
 (defonce max-gain (atom 1.0))
 (defonce waveform-index (atom 0))
 
@@ -23,10 +25,7 @@
   (get waveforms @waveform-index))
 
 (defn defosc [context]
-  (let [osc (.createOscillator context)]
-    (do
-      (.start osc 0)
-      osc)))
+  (.createOscillator context))
 
 (defn defgain [context]
   (let [gain (.createGain context)]
@@ -39,12 +38,18 @@
 (.connect osc1 osc1-gain)
 (.connect osc1-gain (.-destination context))
 
+(defn unlock []
+  (do
+    (.start osc1 0)
+    (reset! unlocked true)))
+
 (defn note-on [frequency]
   (let [now (.-currentTime context)
         waveform (:name (current-waveform))
         osc-frequency (.-frequency osc1)
         osc-gain (.-gain osc1-gain)]
     (do
+      (if (= false @unlocked) (unlock))
       (set! (.-type osc1) waveform)
       (.setValueAtTime osc-frequency frequency now)
       (.setValueAtTime osc-gain @max-gain now))))

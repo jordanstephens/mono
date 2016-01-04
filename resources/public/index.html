@@ -19,7 +19,9 @@
     <script>
     // disable scrolling
     window.addEventListener("touchmove", function(event) { event.preventDefault(); }, false);
-    window.addEventListener("touchstart", function(event) { event.preventDefault(); }, false);
+    window.addEventListener("touchstart", function(event) {
+      if (event.target.tagName !== "A") { event.preventDefault(); }
+    }, false);
     </script>
   </body>
 </html>

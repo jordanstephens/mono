@@ -14,6 +14,7 @@
 (.addEventListener js/document "keydown" controller/handle-keydown)
 (.addEventListener js/document "keyup" controller/handle-keyup)
 (.addEventListener js/document "mouseup" controller/handle-doc-mouseup)
+(.addEventListener js/document "touchend" controller/handle-doc-mouseup)
 
 
 
@@ -26,4 +27,5 @@
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
   (.removeEventListener js/document "keydown" controller/handle-keydown)
   (.removeEventListener js/document "keyup" controller/handle-keyup)
-  (.removeEventListener js/document "mouseup" controller/handle-doc-mouseup))
+  (.removeEventListener js/document "mouseup" controller/handle-doc-mouseup)
+  (.removeEventListener js/document "touchend" controller/handle-doc-mouseup))

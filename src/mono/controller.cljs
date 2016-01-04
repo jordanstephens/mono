@@ -185,15 +185,24 @@
 (defn octave-offset-light [active-values]
   [:li {:data-light (octave-indicator-light? active-values)} "•"])
 
+(defn key-button [key-code label]
+  [:button {:onMouseDown  (.bind handle-key-mousedown nil key-code)
+            :onTouchStart (.bind handle-key-mousedown nil key-code)
+            :onMouseUp    (.bind handle-key-mouseup nil key-code)
+            :onTouchEnd   (.bind handle-key-mouseup nil key-code)
+            :onMouseEnter (.bind handle-key-mouseenter nil key-code)
+            :onMouseLeave (.bind handle-key-mouseleave nil key-code)}
+    [:div label]])
+
 (defn waveform-control-keys []
-  [:div {:className "control-group waveform"}
-    [:div {:className "control-label"}
-      [:ul {:className "waveform-value"}
-        [:li (:label (synth/current-waveform))]]]
-    [:ol {:className "control-keys"}
-      [:li {:key 0 :data-key-down (control-key-is-down? 81)}
-        [:button
-          [:div "q"]]]]])
+  (let [key-code 81]
+    [:div {:className "control-group waveform"}
+      [:div {:className "control-label"}
+        [:ul {:className "waveform-value"}
+          [:li (:label (synth/current-waveform))]]]
+      [:ol {:className "control-keys"}
+        [:li {:key 0 :data-key-down (control-key-is-down? key-code)}
+          [key-button key-code "q"]]]]))
 
 (defn octave-control-keys []
   [:div {:className "control-group octave"}
@@ -208,8 +217,7 @@
         (map-indexed
           (fn [idx [key-code {label :label}]]
             [:li {:key idx :data-key-down (control-key-is-down? key-code)}
-              [:button
-                [:div label]]])
+              [key-button key-code label]])
           octave-key-map))]])
 
 (defn control-keys []
@@ -223,9 +231,5 @@
       (map-indexed
         (fn [idx [key-code {label :label}]]
           [:li {:key idx :data-key-down (keyboard-key-is-down? key-code)}
-            [:button {:onMouseDown  (.bind handle-key-mousedown nil key-code)
-                      :onMouseUp    (.bind handle-key-mouseup nil key-code)
-                      :onMouseEnter (.bind handle-key-mouseenter nil key-code)
-                      :onMouseLeave (.bind handle-key-mouseleave nil key-code)}
-              [:div label]]])
+            [key-button key-code label]])
         keyboard-map))])

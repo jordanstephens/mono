@@ -145,7 +145,7 @@
 
 (defn handle-keydown [event]
   (let [key-code (key-code event)]
-    (if (valid-key? key-code)
+    (if (and (valid-key? key-code) (not (.-metaKey event)))
       (do
         (.preventDefault event)
         (keydown key-code)))))

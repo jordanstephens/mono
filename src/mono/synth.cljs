@@ -58,7 +58,7 @@
     (do
       (if (= false @unlocked) (unlock))
       (.setValueAtTime osc-frequency frequency now)
-      (.setValueAtTime osc-gain @max-gain now))))
+      (set! (.-value (.-gain osc1-gain)) @max-gain))))
 
 (defn note-off []
-  (.setValueAtTime (.-gain osc1-gain) 0.0 (.-currentTime context)))
+  (set! (.-value (.-gain osc1-gain)) 0.0))

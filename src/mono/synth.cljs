@@ -18,16 +18,6 @@
    {:name "triangle" :label "⋀"}
    {:name "square" :label "⊓"}])
 
-(defn change-waveform []
-  (let [new-waveform-index (mod (+ @waveform-index 1) 3)
-        new-waveform (:name (get waveforms new-waveform-index))]
-    (do
-      (reset! waveform-index new-waveform-index)
-      (set! (.-type osc1) new-waveform))))
-
-(defn current-waveform []
-  (get waveforms @waveform-index))
-
 (defn defosc [context]
   (.createOscillator context))
 
@@ -45,6 +35,16 @@
 (.connect osc1-gain (.-destination context))
 
 
+
+(defn current-waveform []
+  (get waveforms @waveform-index))
+
+(defn change-waveform []
+  (let [new-waveform-index (mod (+ @waveform-index 1) 3)
+        new-waveform (:name (get waveforms new-waveform-index))]
+    (do
+      (reset! waveform-index new-waveform-index)
+      (set! (.-type osc1) new-waveform))))
 
 (defn unlock []
   (do

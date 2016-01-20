@@ -10,28 +10,28 @@
 ; use an array-map to maintain key order
 (defonce keyboard-map
   (array-map
-    90  {:label "z"}
-    83  {:label "s"}
-    88  {:label "x"}
-    68  {:label "d"}
-    67  {:label "c"}
-    86  {:label "v"}
-    71  {:label "g"}
-    66  {:label "b"}
-    72  {:label "h"}
-    78  {:label "n"}
-    74  {:label "j"}
-    77  {:label "m"}
-    188 {:label ","}))
+    90  "z"
+    83  "s"
+    88  "x"
+    68  "d"
+    67  "c"
+    86  "v"
+    71  "g"
+    66  "b"
+    72  "h"
+    78  "n"
+    74  "j"
+    77  "m"
+    188 ","))
 
 (defonce octave-key-map
   (array-map
-    219 {:label "["}
-    221 {:label "]"}))
+    219 "["
+    221 "]"))
 
 (defonce waveform-key-map
   (array-map
-    81 {:label "q"}))
+    81 "q"))
 
 (defonce control-key-map
   (merge octave-key-map waveform-key-map))
@@ -215,7 +215,7 @@
     [:ol {:className "control-keys"}
       (doall
         (map-indexed
-          (fn [idx [key-code {label :label}]]
+          (fn [idx [key-code label]]
             [:li {:key idx :data-key-down (control-key-is-down? key-code)}
               [key-button key-code label]])
           octave-key-map))]])
@@ -229,7 +229,7 @@
   [:ol {:className "keyboard"}
     (doall
       (map-indexed
-        (fn [idx [key-code {label :label}]]
+        (fn [idx [key-code label]]
           [:li {:key idx :data-key-down (keyboard-key-is-down? key-code)}
             [key-button key-code label]])
         keyboard-map))])

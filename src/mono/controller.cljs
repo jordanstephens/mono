@@ -10,19 +10,19 @@
 ; use an array-map to maintain key order
 (defonce keyboard-map
   (array-map
-    90  {:label "z" :x 0}
-    83  {:label "s" :x 0.5}
-    88  {:label "x" :x 1}
-    68  {:label "d" :x 1.5}
-    67  {:label "c" :x 2}
-    86  {:label "v" :x 3}
-    71  {:label "g" :x 3.5}
-    66  {:label "b" :x 4}
-    72  {:label "h" :x 4.5}
-    78  {:label "n" :x 5}
-    74  {:label "j" :x 5.5}
-    77  {:label "m" :x 6}
-    188 {:label "," :x 7}))
+    90  {:label "z"}
+    83  {:label "s"}
+    88  {:label "x"}
+    68  {:label "d"}
+    67  {:label "c"}
+    86  {:label "v"}
+    71  {:label "g"}
+    66  {:label "b"}
+    72  {:label "h"}
+    78  {:label "n"}
+    74  {:label "j"}
+    77  {:label "m"}
+    188 {:label ","}))
 
 (defonce octave-key-map
   (array-map
